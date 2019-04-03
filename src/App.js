@@ -7,8 +7,7 @@ class App extends Component {
       movement: {
         iteration: 15,
         direction: "r"
-      },
-     
+      }
     },
     bird: {
       dimensions: {
@@ -22,6 +21,11 @@ class App extends Component {
       },
       talking: {
         x: -110,
+        y: -130,
+        selected: false
+      },
+      fireball: {
+        x: -250,
         y: -130,
         selected: false
       },
@@ -39,40 +43,46 @@ class App extends Component {
     });
   }
 
+  fireball = () => {
+    console.log("Booom!", this.state.controls.movement.direction)
+    setTimeout(() => {
+      this.setState(prevState => {
+        return {
+          ...prevState,
+          bird: {
+            ...prevState.bird,
+            fireball: {
+              ...prevState.bird.fireball,
+              selected: false
+            }
+          }
+        }
+      })
+    }, 400)
+  }
+
   handleKeyPress = e => {
+    console.log(e.keyCode)
     if (this.state.bird.talking.selected) {
-      return
+      return;
     }
-    switch (e.key) {
-      case "ArrowDown":
+    switch (e.keyCode) {
+      case 74:
         this.setState(prevState => {
           return {
             ...prevState,
             bird: {
               ...prevState.bird,
-              position: {
-                ...prevState.bird.position,
-                y: prevState.bird.position.y + this.state.controls.movement.iteration
+              fireball: {
+                ...prevState.bird.fireball,
+                selected: true,
               }
             }
           };
         });
+        this.fireball()
         break;
-      case "ArrowUp":
-        this.setState(prevState => {
-          return {
-            ...prevState,
-            bird: {
-              ...prevState.bird,
-              position: {
-                ...prevState.bird.position,
-                y: prevState.bird.position.y - this.state.controls.movement.iteration
-              }
-            }
-          };
-        });
-        break;
-      case "ArrowLeft":
+      case 37:
         this.setState(prevState => {
           return {
             ...prevState,
@@ -87,13 +97,15 @@ class App extends Component {
               ...prevState.bird,
               position: {
                 ...prevState.bird.position,
-                x: prevState.bird.position.x - this.state.controls.movement.iteration
+                x:
+                  prevState.bird.position.x -
+                  this.state.controls.movement.iteration
               }
             }
           };
         });
         break;
-      case "ArrowRight":
+      case 39:
         this.setState(prevState => {
           return {
             ...prevState,
@@ -108,7 +120,9 @@ class App extends Component {
               ...prevState.bird,
               position: {
                 ...prevState.bird.position,
-                x: prevState.bird.position.x + this.state.controls.movement.iteration
+                x:
+                  prevState.bird.position.x +
+                  this.state.controls.movement.iteration
               }
             }
           };
@@ -188,7 +202,12 @@ class App extends Component {
     return (
       <div className="App">
         <button
-          style={{ position: "absolute", top: "30%", left: "50%" }}
+          style={{
+            position: "absolute",
+            top: "30%",
+            left: "50%",
+            transform: "translate(-50%, -50%)"
+          }}
           onClick={this.toggleSpeak}
         >
           Peekaboo!
@@ -204,13 +223,16 @@ class App extends Component {
             display: !this.state.bird.animation.selected && "none",
             transform: `translate(${this.state.bird.position.x}%, ${
               this.state.bird.position.y
-            }%) ${this.state.controls.movement.direction === "r" ? "scaleX(-1)" : "scaleX(1)"}`
-             
+            }%) ${
+              this.state.controls.movement.direction === "r"
+                ? "scaleX(-1)"
+                : "scaleX(1)"
+            }`
           }}
         />
 
         <div
-          className="bird"
+          className="bird talking"
           style={{
             height: this.state.bird.dimensions.height,
             width: this.state.bird.dimensions.width,
@@ -218,6 +240,21 @@ class App extends Component {
               this.state.bird.talking.y
             }px`,
             display: !this.state.bird.talking.selected && "none",
+            transform: `translate(${this.state.bird.position.x}%, ${
+              this.state.bird.position.y
+            }%)`
+          }}
+        />
+
+        <div
+          className={this.state.controls.movement.direction === "l" ? "bird fireballLeft" : "bird fireballRight"}
+          style={{
+            height: this.state.bird.dimensions.height,
+            width: this.state.bird.dimensions.width,
+            backgroundPosition: `${this.state.bird.fireball.x}px ${
+              this.state.bird.fireball.y
+            }px`,
+            display: this.state.bird.fireball.selected && "none",
             transform: `translate(${this.state.bird.position.x}%, ${
               this.state.bird.position.y
             }%)`
