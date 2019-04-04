@@ -25,6 +25,7 @@ let flySelected = true;
 
 class App extends Component {
   state = {
+    score: 0,
     controls: {
       movement: {
         iteration: 10,
@@ -67,7 +68,7 @@ class App extends Component {
   };
 
   componentDidMount() {
-    this.fly();
+    this.gameLoop();
     document.addEventListener("keydown", e => {
       this.handleKeyPress(e);
     });
@@ -120,6 +121,7 @@ class App extends Component {
     await this.setState(prevState => {
       return {
         ...prevState,
+        score: prevState.score + 1,
         bird: {
           ...prevState.bird,
           fireball: {
@@ -135,33 +137,6 @@ class App extends Component {
         }
       };
     });
-
-    setInterval(() => {
-      const animateData = this.state.bird.fireball.test
-        .filter(fireballPosition => {
-          return fireballPosition.x < 2000;
-        })
-        .map(fireball => {
-          return {
-            x: fireball.x + 5,
-            y: fireball.y
-          };
-        });
-        console.log(animateData);
-      this.setState(prevState => {
-        return {
-          ...prevState,
-          bird: {
-            ...prevState.bird,
-            fireball: {
-              ...prevState.bird.fireball,
-              selected: true,
-              test: animateData
-            }
-          }
-        };
-      });
-    }, 16);
   };
 
   handleKeyPress = e => {
@@ -219,7 +194,32 @@ class App extends Component {
     });
   };
 
-  fly = (speed = 130) => {
+  gameLoop = (speed = 130) => {
+    setInterval(() => {
+      const animateData = this.state.bird.fireball.test
+        .filter(fireballPosition => {
+          return fireballPosition.x < 2000;
+        })
+        .map(fireball => {
+          return {
+            x: fireball.x + 20,
+            y: fireball.y
+          };
+        });
+      this.setState(prevState => {
+        return {
+          ...prevState,
+          bird: {
+            ...prevState.bird,
+            fireball: {
+              ...prevState.bird.fireball,
+              selected: true,
+              test: animateData
+            }
+          }
+        };
+      });
+    }, 16);
     setInterval(() => {
       this.setState(prevState => {
         switch (prevState.bird.animation.x) {
@@ -266,7 +266,6 @@ class App extends Component {
   };
 
   render() {
-    
     const fireballContent = this.state.bird.fireball.test.map(fireball => {
       return (
         <div
@@ -316,22 +315,10 @@ class App extends Component {
           }}
         />
         {fireballContent}
-
-        {/* <div
-          className="bird fireball"
-          style={{
-            height: this.state.bird.dimensions.height,
-            width: this.state.bird.dimensions.width,
-            backgroundPosition: `${this.state.bird.fireball.x}px ${
-              this.state.bird.fireball.y
-            }px`,
-            display: !this.state.bird.fireball.selected && "none",
-
-            transform: `translate(${this.state.bird.fireball.animation.x}%, ${
-              this.state.bird.fireball.animation.y
-            }%)`
-          }}
-        /> */}
+        <div className="score">
+          <h1>Score: <span>{this.state.score}</span></h1>
+        </div>
+        <button onClick={this.fireball} className="fire"/>
       </div>
     );
   }

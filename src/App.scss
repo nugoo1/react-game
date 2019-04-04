@@ -24,11 +24,19 @@
     url("./images/background/Layer_0002.png"),
     url("./images/background/Layer_0003.png"),
     url("./images/background/Layer_0004.png");
-    background-repeat: repeat-x;
-    z-index: 50;
+  background-repeat: repeat-x;
+  z-index: 50;
   animation: textureAnimation 3s infinite linear;
 }
 
+.score {
+  position: absolute;
+  color: white;
+  z-index: 1025;
+  left: 50%;
+  top: 10%;
+  transform: translate(-50%, -50%);
+}
 
 @keyframes textureAnimation {
   from {
@@ -38,7 +46,6 @@
     background-position: 0px 100%;
   }
 }
-
 
 @keyframes backgroundAnimation {
   from {
@@ -56,4 +63,31 @@
   left: 20%;
   transform: translate(-50%, -50%);
   background-image: url("./images/sprites.png");
+}
+
+.fire {
+  display: none;
+}
+
+@media only screen and (max-width: 1025px) {
+  .fire {
+    display: block;
+    position: absolute;
+    left: 10%;
+    bottom: 20%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+    border: solid 2px #333;
+    background-image: url("./images/sprites.png");
+    background-position: -279px -164px;
+    background-color: lighten(orange, 12%);
+    outline: none;
+  }
+
+  .fire:active {
+    background-color: orange;
+  }
 }
