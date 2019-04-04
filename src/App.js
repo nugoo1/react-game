@@ -1,6 +1,19 @@
 import React, { Component } from "react";
 import "./App.scss";
 
+// Images
+import backgroundLayer0 from "./images/background/Layer_0000.png";
+import backgroundLayer1 from "./images/background/Layer_0001.png";
+import backgroundLayer2 from "./images/background/Layer_0002.png";
+import backgroundLayer3 from "./images/background/Layer_0003.png";
+import backgroundLayer4 from "./images/background/Layer_0004.png";
+import backgroundLayer5 from "./images/background/Layer_0005.png";
+import backgroundLayer6 from "./images/background/Layer_0006.png";
+import backgroundLayer7 from "./images/background/Layer_0007.png";
+import backgroundLayer8 from "./images/background/Layer_0008.png";
+import backgroundLayer9 from "./images/background/Layer_0009.png";
+import backgroundLayer10 from "./images/background/Layer_0010.png";
+
 // Initial Variables
 const movement = {
   x: 0,
@@ -189,25 +202,47 @@ class App extends Component {
   };
 
   render() {
-    let transformContent = ""
-    switch(this.state.controls.movement.direction) {
+    let transformContent = "";
+    switch (this.state.controls.movement.direction) {
       case "u":
-        transformContent = `${this.state.bird.down.x}px ${this.state.bird.down.y}px`;
+        transformContent = `${this.state.bird.down.x}px ${
+          this.state.bird.down.y
+        }px`;
         break;
       case "d":
-        transformContent = `${this.state.bird.up.x}px ${this.state.bird.up.y}px`;
+        transformContent = `${this.state.bird.up.x}px ${
+          this.state.bird.up.y
+        }px`;
         break;
-      default: 
-        transformContent = `${this.state.bird.animation.x}px ${this.state.bird.animation.y}px`
+      default:
+        transformContent = `${this.state.bird.animation.x}px ${
+          this.state.bird.animation.y
+        }px`;
     }
     return (
-      <div className="App">
+      <div
+        className="Map"
+        style={{
+          backgroundImage: `
+          url(${backgroundLayer0}), 
+          url(${backgroundLayer1}), 
+          url(${backgroundLayer2}), 
+          url(${backgroundLayer3}), 
+          url(${backgroundLayer4}), 
+          url(${backgroundLayer5}), 
+          url(${backgroundLayer6}), 
+          url(${backgroundLayer7}), 
+          url(${backgroundLayer8}), 
+          url(${backgroundLayer9}), 
+          url(${backgroundLayer10}) `
+        }}
+      >
         <div
           className="bird leftRight"
           style={{
             height: this.state.bird.dimensions.height,
             width: this.state.bird.dimensions.width,
-            backgroundPosition: transformContent,              
+            backgroundPosition: transformContent,
             transform: `translate(${this.state.bird.position.x}%, ${
               this.state.bird.position.y
             }%) ${

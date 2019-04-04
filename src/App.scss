@@ -1,11 +1,77 @@
-.App {
-  background-color: #3d3d3d;
+.Map {
+  background-color: #7693b3;
   width: 100vw;
   height: 100vh;
+  animation: backgroundAnimation 5s infinite linear;
+  background-repeat: repeat-x;
+  position: relative;
+  background-image: url("./images/background/Layer_0005.png"),
+    url("./images/background/Layer_0006.png"),
+    url("./images/background/Layer_0007.png"),
+    url("./images/background/Layer_0008.png"),
+    url("./images/background/Layer_0009.png"),
+    url("./images/background/Layer_0010.png");
 }
+
+.Map::after {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  bottom: 0;
+  content: "";
+  background-image: url("./images/background/Layer_0000.png"),
+    url("./images/background/Layer_0001.png"),
+    url("./images/background/Layer_0002.png"),
+    url("./images/background/Layer_0003.png"),
+    url("./images/background/Layer_0004.png");
+    background-repeat: repeat-x;
+    z-index: 50;
+  animation: textureAnimation 3s infinite linear;
+}
+
+
+@keyframes textureAnimation {
+  from {
+    background-position: 928px 100%;
+  }
+  to {
+    background-position: 0px 100%;
+  }
+}
+
+
+@keyframes backgroundAnimation {
+  from {
+    background-position: 928px 100%;
+  }
+  to {
+    background-position: 0px 100%;
+  }
+}
+
+// .Map::before {
+//   content: "";
+//   height: 100%;
+//   width: 100%;
+//   background-image: url("./images/background/Layer_0000.png"),
+//     url("./images/background/Layer_0001.png"),
+//     url("./images/background/Layer_0002.png");
+//   background-position: 50% 50%;
+//   animation: textureAnimation 2s infinite forwards;
+// }
+
+// @keyframes texttureAnimation {
+//   from {
+//     background-position: 50% 50%;
+//   }
+//   to {
+//     background-position: 150% 50%;
+//   }
+// }
 
 .bird {
   position: absolute;
+  z-index: 1000;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
