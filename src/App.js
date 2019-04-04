@@ -27,7 +27,7 @@ class App extends Component {
   state = {
     controls: {
       movement: {
-        iteration: 15,
+        iteration: 10,
         direction: direction
       }
     },
@@ -51,7 +51,11 @@ class App extends Component {
       fireball: {
         x: -250,
         y: -130,
-        selected: false
+        selected: false,
+        animation: {
+          x: 0,
+          y: 0
+        }
       },
       position: {
         x: 0,
@@ -68,9 +72,27 @@ class App extends Component {
     });
   }
 
-  fireball = () => {
-    console.log("Booom!", this.state.controls.movement.direction);
-    setTimeout(() => {
+  fireball = async () => {
+    const direction = this.state.controls.movement.direction === "r"
+
+    await this.setState(prevState => {
+      return {
+        ...prevState,
+        bird: {
+          ...prevState.bird,
+          fireball: {
+            ...prevState.bird.fireball,
+            animation: {
+              x: prevState.controls.movement.direction === "r" ? prevState.bird.position.x + 50 : prevState.bird.position.x - 50,
+              y: prevState.bird.position.y
+            }
+            
+          }
+        }
+      }
+    })
+
+    const fireballAnimation = setInterval(() => {
       this.setState(prevState => {
         return {
           ...prevState,
@@ -78,30 +100,46 @@ class App extends Component {
             ...prevState.bird,
             fireball: {
               ...prevState.bird.fireball,
-              selected: false
+              selected: true,
+              animation: {
+                ...prevState.bird.fireball.animation,
+                x: direction ? prevState.bird.fireball.animation.x + 4 : prevState.bird.fireball.animation.x -4
+              }
+              
             }
           }
-        };
-      });
-    }, 400);
+        }
+      })
+    }, 16)
+
+    setTimeout(() => {
+      clearInterval(fireballAnimation);
+      this.setState(prevState => {
+        return {
+          ...prevState,
+          bird: {
+            ...prevState.bird,
+            fireball: {
+              ...prevState.bird.fireball,
+              selected: false,
+              animation: {
+                ...prevState.bird.fireball.animation,
+                x: prevState.bird.position.x
+              }
+            }
+          }
+        }
+      })
+    }, 1000)
   };
 
   handleKeyPress = e => {
     switch (e.keyCode) {
       // Fireball
       case 74:
-        this.setState(prevState => {
-          return {
-            ...prevState,
-            bird: {
-              ...prevState.bird,
-              fireball: {
-                ...prevState.bird.fireball,
-                selected: true
-              }
-            }
-          };
-        });
+        if(this.state.bird.fireball.selected || this.state.controls.movement.direction === "u" || this.state.controls.movement.direction === "d") {
+          return
+        } 
         this.fireball();
         break;
 
@@ -116,7 +154,6 @@ class App extends Component {
       case 38:
         movement.y =
           this.state.bird.position.y - this.state.controls.movement.iteration;
-        direction = "u";
         flySelected = false;
         break;
 
@@ -129,14 +166,13 @@ class App extends Component {
       case 40:
         movement.y =
           this.state.bird.position.y + this.state.controls.movement.iteration;
-        direction = "d";
         flySelected = false;
         break;
       default:
         return;
     }
+    console.log(direction);
     this.setState(prevState => {
-      console.log(flySelected);
       return {
         ...prevState,
         controls: {
@@ -204,16 +240,16 @@ class App extends Component {
   render() {
     let transformContent = "";
     switch (this.state.controls.movement.direction) {
-      case "u":
-        transformContent = `${this.state.bird.down.x}px ${
-          this.state.bird.down.y
-        }px`;
-        break;
-      case "d":
-        transformContent = `${this.state.bird.up.x}px ${
-          this.state.bird.up.y
-        }px`;
-        break;
+      // case "u":
+      //   transformContent = `${this.state.bird.down.x}px ${
+      //     this.state.bird.down.y
+      //   }px`;
+      //   break;
+      // case "d":
+      //   transformContent = `${this.state.bird.up.x}px ${
+      //     this.state.bird.up.y
+      //   }px`;
+      //   break;
       default:
         transformContent = `${this.state.bird.animation.x}px ${
           this.state.bird.animation.y
@@ -238,7 +274,7 @@ class App extends Component {
         }}
       >
         <div
-          className="bird leftRight"
+          className="bird"
           style={{
             height: this.state.bird.dimensions.height,
             width: this.state.bird.dimensions.width,
@@ -252,33 +288,8 @@ class App extends Component {
             }`
           }}
         />
-
-        {/* <div
-          className="bird upDown"
-          style={{
-            height: this.state.bird.dimensions.height,
-            width: this.state.bird.dimensions.width,
-            backgroundPosition:
-              this.state.controls.movement.direction === "u"
-                ? `${this.state.bird.down.x}px ${this.state.bird.down.y}px`
-                : `${this.state.bird.up.x}px ${this.state.bird.up.y}px`,
-            transform: `translate(${this.state.bird.position.x}%, ${
-              this.state.bird.position.y
-            }%) ${
-              this.state.controls.movement.direction === "r"
-                ? "scaleX(-1)"
-                : "scaleX(1)"
-            }`,
-            display: !this.state.bird.position.selected && "none"
-          }}
-        /> */}
-
         <div
-          className={
-            this.state.controls.movement.direction === "l"
-              ? "bird fireballLeft"
-              : "bird fireballRight"
-          }
+          className="bird fireball"
           style={{
             height: this.state.bird.dimensions.height,
             width: this.state.bird.dimensions.width,
@@ -286,8 +297,9 @@ class App extends Component {
               this.state.bird.fireball.y
             }px`,
             display: !this.state.bird.fireball.selected && "none",
-            transform: `translate(${this.state.bird.position.x}%, ${
-              this.state.bird.position.y
+            
+            transform: `translate(${this.state.bird.fireball.animation.x}%, ${
+              this.state.bird.fireball.animation.y
             }%)`
           }}
         />

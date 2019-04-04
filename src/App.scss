@@ -1,7 +1,7 @@
 .Map {
   background-color: #7693b3;
   width: 100vw;
-  height: 100vh;
+  height: 80vh;
   animation: backgroundAnimation 5s infinite linear;
   background-repeat: repeat-x;
   position: relative;
@@ -49,31 +49,11 @@
   }
 }
 
-// .Map::before {
-//   content: "";
-//   height: 100%;
-//   width: 100%;
-//   background-image: url("./images/background/Layer_0000.png"),
-//     url("./images/background/Layer_0001.png"),
-//     url("./images/background/Layer_0002.png");
-//   background-position: 50% 50%;
-//   animation: textureAnimation 2s infinite forwards;
-// }
-
-// @keyframes texttureAnimation {
-//   from {
-//     background-position: 50% 50%;
-//   }
-//   to {
-//     background-position: 150% 50%;
-//   }
-// }
-
 .bird {
   position: absolute;
   z-index: 1000;
-  top: 50%;
-  left: 50%;
+  bottom: 25%;
+  left: 20%;
   transform: translate(-50%, -50%);
   background-image: url("./images/sprites.png");
 }
