@@ -14,29 +14,21 @@ import backgroundLayer8 from "./images/background/Layer_0008.png";
 import backgroundLayer9 from "./images/background/Layer_0009.png";
 import backgroundLayer10 from "./images/background/Layer_0010.png";
 
-// Sounds
-import backgroundMusic from "./sounds/background.mp3";
-
-// Initial Variables
-const movement = {
-  x: 0,
-  y: 0
-};
-
-let direction = "r";
-let flySelected = true;
+const demoData = [
+  {
+    position: {
+      x: 0,
+      y: 0
+    }
+  }
+];
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.myRef = React.createRef();
-  }
   state = {
     score: 0,
     controls: {
       movement: {
-        iteration: 10,
-        direction: direction
+        iteration: 10
       }
     },
     enemies: [],
@@ -76,17 +68,13 @@ class App extends Component {
   };
 
   componentDidMount() {
+    this.test();
     this.gameLoop();
-    this.volumeControl();
     document.addEventListener("keydown", e => {
       this.handleKeyPress(e);
     });
+    window.addEventListener("resize", this.test);
   }
-
-  volumeControl = () => {
-    const audioNode = this.myRef.current
-    audioNode.volume = 0.2
-  };
 
   fireball = () => {
     this.setState(prevState => {
@@ -110,58 +98,76 @@ class App extends Component {
     });
   };
 
-  // Controls
+  test = () => {
+    const width =
+      window.innerWidth ||
+      document.documentElement.clientWidth ||
+      document.body.clientWidth;
 
+    const height =
+      window.innerHeight ||
+      document.documentElement.clientHeight ||
+      document.body.clientHeight;
+
+    console.log(width, height);
+    console.log(width / 100, height / 100);
+
+    this.setState(prevState => {
+      return {
+        ...prevState,
+        bird: {
+          ...prevState.bird,
+          position: {
+            x:  width / 4,
+            y:  height / 2
+          }
+        }
+      };
+    });
+  };
+
+  // Controls
   handleKeyPress = e => {
+    // Initial Variables
+    const movement = {
+      x: 0,
+      y: 0
+    };
+
+    // Switch Statement for Controls **Todo - add multiple key event
     switch (e.keyCode) {
       // Fireball
       case 74:
         this.fireball();
         break;
-
       // Movement
       case 37:
-        movement.x =
-          this.state.bird.position.x - this.state.controls.movement.iteration;
-        direction = "l";
-        flySelected = true;
+        movement.x = this.state.controls.movement.iteration * -1;
         break;
 
       case 38:
-        movement.y =
-          this.state.bird.position.y - this.state.controls.movement.iteration;
-        flySelected = false;
+        movement.y = this.state.controls.movement.iteration * -1;
         break;
 
       case 39:
-        movement.x =
-          this.state.bird.position.x + this.state.controls.movement.iteration;
-        direction = "r";
-        flySelected = true;
+        movement.x = this.state.controls.movement.iteration;
         break;
       case 40:
-        movement.y =
-          this.state.bird.position.y + this.state.controls.movement.iteration;
-        flySelected = false;
+        movement.y = this.state.controls.movement.iteration;
         break;
       default:
         return;
     }
-    console.log(direction);
     this.setState(prevState => {
+      console.log(movement);
       return {
         ...prevState,
-        controls: {
-          ...prevState.controls,
-          movement: {
-            ...prevState.controls.movement,
-            direction: direction
-          }
-        },
         bird: {
           ...prevState.bird,
-          position: movement,
-          selected: flySelected
+          position: {
+            x: prevState.bird.position.x + movement.x,
+            y: prevState.bird.position.y + movement.y
+          }
         }
       };
     });
@@ -290,23 +296,29 @@ class App extends Component {
             }%) scaleX(-1)`
           }}
         />
+        {/* <div
+          className="enemy"
+          style={{
+            height: this.state.bird.dimensions.height,
+            width: this.state.bird.dimensions.width,
+            backgroundPosition: `${this.state.bird.animation.x}px ${
+              this.state.bird.animation.y
+            }px`,
+            transform: `translate(${this.state.bird.position.x }%, ${
+              this.state.bird.position.y
+            }%)`
+          }}
+        /> */}
+        
+        <button onClick={this.fireball} className="fire" />
+
         {fireballContent}
+
         <div className="score">
           <h1>
             Score: <span>{this.state.score}</span>
           </h1>
-
-          <audio
-            ref={this.myRef}
-            className="audioControls"
-            src={backgroundMusic}
-            controls
-            autoPlay={true}
-            loop={true}
-            style={{ position: "absolute", zIndex: "500" }}
-          />
         </div>
-        <button onClick={this.fireball} className="fire" />
       </div>
     );
   }

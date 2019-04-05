@@ -59,8 +59,13 @@
 .bird {
   position: absolute;
   z-index: 1000;
-  bottom: 25%;
-  left: 20%;
+  transform: translate(-50%, -50%);
+  background-image: url("./images/sprites.png");
+}
+
+.enemy {
+  position: absolute;
+  z-index: 1000;
   transform: translate(-50%, -50%);
   background-image: url("./images/sprites.png");
 }
@@ -98,9 +103,17 @@
     background-position: -279px -164px;
     background-color: lighten(orange, 12%);
     outline: none;
+    top: 80%;
+    left: 10%;
   }
 
   .fire:active {
     background-color: orange;
+  }
+}
+
+@media only screen and (max-width: 400px) {
+  .fire {
+    left: 50%;
   }
 }
