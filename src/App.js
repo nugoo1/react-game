@@ -14,6 +14,9 @@ import backgroundLayer8 from "./images/background/Layer_0008.png";
 import backgroundLayer9 from "./images/background/Layer_0009.png";
 import backgroundLayer10 from "./images/background/Layer_0010.png";
 
+// Sounds
+import backgroundMusic from "./sounds/background.mp3";
+
 // Initial Variables
 const movement = {
   x: 0,
@@ -24,6 +27,10 @@ let direction = "r";
 let flySelected = true;
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.myRef = React.createRef();
+  }
   state = {
     score: 0,
     controls: {
@@ -32,6 +39,7 @@ class App extends Component {
         direction: direction
       }
     },
+    enemies: [],
     bird: {
       dimensions: {
         height: "100px",
@@ -69,56 +77,19 @@ class App extends Component {
 
   componentDidMount() {
     this.gameLoop();
+    this.volumeControl();
     document.addEventListener("keydown", e => {
       this.handleKeyPress(e);
     });
   }
 
-  fireball = async () => {
-    const direction = this.state.controls.movement.direction === "r";
-    // await this.setState(prevState => {
-    //   return {
-    //     ...prevState,
-    //     bird: {
-    //       ...prevState.bird,
-    //       fireball: {
-    //         ...prevState.bird.fireball,
-    //         test: [...prevState.bird.fireball.test, {
-    //           x:
-    //             prevState.controls.movement.direction === "r"
-    //               ? prevState.bird.position.x + 50
-    //               : prevState.bird.position.x - 50,
-    //           y: prevState.bird.position.y
-    //         }]
-    //       }
-    //     }
-    //   };
-    // });
+  volumeControl = () => {
+    const audioNode = this.myRef.current
+    audioNode.volume = 0.2
+  };
 
-    // const fireballAnimation = setInterval(() => {
-    //   this.setState(prevState => {
-    //     return {
-    //       ...prevState,
-    //       bird: {
-    //         ...prevState.bird,
-    //         fireball: {
-    //           ...prevState.bird.fireball,
-    //           selected: true,
-    //           animation: {
-    //             ...prevState.bird.fireball.animation,
-    //             x: direction
-    //               ? prevState.bird.fireball.animation.x + 4
-    //               : prevState.bird.fireball.animation.x - 4
-    //           }
-    //         }
-    //       }
-    //     };
-    //   });
-    // }, 16);
-
-    // Testing code please delete after
-
-    await this.setState(prevState => {
+  fireball = () => {
+    this.setState(prevState => {
       return {
         ...prevState,
         score: prevState.score + 1,
@@ -138,6 +109,8 @@ class App extends Component {
       };
     });
   };
+
+  // Controls
 
   handleKeyPress = e => {
     switch (e.keyCode) {
@@ -196,6 +169,9 @@ class App extends Component {
 
   gameLoop = (speed = 130) => {
     setInterval(() => {
+      if (!this.state.bird.fireball.test.length > 0) {
+        return;
+      }
       const animateData = this.state.bird.fireball.test
         .filter(fireballPosition => {
           return fireballPosition.x < 2000;
@@ -316,9 +292,21 @@ class App extends Component {
         />
         {fireballContent}
         <div className="score">
-          <h1>Score: <span>{this.state.score}</span></h1>
+          <h1>
+            Score: <span>{this.state.score}</span>
+          </h1>
+
+          <audio
+            ref={this.myRef}
+            className="audioControls"
+            src={backgroundMusic}
+            controls
+            autoPlay={true}
+            loop={true}
+            style={{ position: "absolute", zIndex: "500" }}
+          />
         </div>
-        <button onClick={this.fireball} className="fire"/>
+        <button onClick={this.fireball} className="fire" />
       </div>
     );
   }
