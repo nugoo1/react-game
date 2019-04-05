@@ -71,7 +71,6 @@ class App extends Component {
     this.setState(prevState => {
       return {
         ...prevState,
-        score: prevState.score + 1,
         bird: {
           ...prevState.bird,
           fireball: {
