@@ -67,7 +67,8 @@
   position: absolute;
   z-index: 1000;
   transform: translate(-50%, -50%);
-  background-image: url("./images/sprites.png");
+  background-image: url("./images/spritesCoin.png");
+  background-size: cover;
 }
 
 .fire {

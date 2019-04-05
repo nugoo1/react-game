@@ -14,21 +14,16 @@ import backgroundLayer8 from "./images/background/Layer_0008.png";
 import backgroundLayer9 from "./images/background/Layer_0009.png";
 import backgroundLayer10 from "./images/background/Layer_0010.png";
 
-const demoData = [
-  {
-    position: {
-      x: 0,
-      y: 0
-    }
-  }
-];
-
 class App extends Component {
   state = {
     score: 0,
     controls: {
       movement: {
         iteration: 10
+      },
+      window: {
+        width: 0,
+        height: 0
       }
     },
     enemies: [],
@@ -53,11 +48,7 @@ class App extends Component {
         x: -250,
         y: -130,
         selected: false,
-        animation: {
-          x: 0,
-          y: 0
-        },
-        test: []
+        animation: []
       },
       position: {
         x: 0,
@@ -68,12 +59,12 @@ class App extends Component {
   };
 
   componentDidMount() {
-    this.test();
+    this.setPosition();
     this.gameLoop();
     document.addEventListener("keydown", e => {
       this.handleKeyPress(e);
     });
-    window.addEventListener("resize", this.test);
+    window.addEventListener("resize", this.setPosition);
   }
 
   fireball = () => {
@@ -85,8 +76,8 @@ class App extends Component {
           ...prevState.bird,
           fireball: {
             ...prevState.bird.fireball,
-            test: [
-              ...prevState.bird.fireball.test,
+            animation: [
+              ...prevState.bird.fireball.animation,
               {
                 x: prevState.bird.position.x + 50,
                 y: prevState.bird.position.y
@@ -98,7 +89,7 @@ class App extends Component {
     });
   };
 
-  test = () => {
+  setPosition = () => {
     const width =
       window.innerWidth ||
       document.documentElement.clientWidth ||
@@ -109,17 +100,22 @@ class App extends Component {
       document.documentElement.clientHeight ||
       document.body.clientHeight;
 
-    console.log(width, height);
-    console.log(width / 100, height / 100);
-
     this.setState(prevState => {
       return {
         ...prevState,
+        controls: {
+          ...prevState.controls,
+          window: {
+            ...prevState.controls.window,
+            width,
+            height
+          }
+        },
         bird: {
           ...prevState.bird,
           position: {
-            x:  width / 4,
-            y:  height / 2
+            x: width / 4,
+            y: height / 2
           }
         }
       };
@@ -134,7 +130,11 @@ class App extends Component {
       y: 0
     };
 
-    // Switch Statement for Controls **Todo - add multiple key event
+    // Switch Statement for Controls
+    // **Todo - add multiple key event
+    // **Todo - optimize the if statements for switch statements (mobile)
+    //
+
     switch (e.keyCode) {
       // Fireball
       case 74:
@@ -142,24 +142,37 @@ class App extends Component {
         break;
       // Movement
       case 37:
+        if (this.state.bird.position.x < this.state.controls.window.width * 0.1)
+          return;
         movement.x = this.state.controls.movement.iteration * -1;
         break;
 
       case 38:
+        if (
+          this.state.bird.position.y <
+          this.state.controls.window.height * 0.25
+        )
+          return;
         movement.y = this.state.controls.movement.iteration * -1;
         break;
 
       case 39:
+        if (this.state.bird.position.x > this.state.controls.window.width * 0.3)
+          return;
         movement.x = this.state.controls.movement.iteration;
         break;
       case 40:
+        if (
+          this.state.bird.position.y >
+          this.state.controls.window.height * 0.85
+        )
+          return;
         movement.y = this.state.controls.movement.iteration;
         break;
       default:
         return;
     }
     this.setState(prevState => {
-      console.log(movement);
       return {
         ...prevState,
         bird: {
@@ -174,11 +187,104 @@ class App extends Component {
   };
 
   gameLoop = (speed = 130) => {
+    // this.setState(prevState => {
+    //   return {
+    //     ...prevState,
+    //     enemies: [
+    //       ...prevState.enemies,
+    //       {
+    //         position: {
+    //           x:
+    //             prevState.controls.window.width -
+    //             prevState.controls.window.width * 0.3 +
+    //             Math.floor(Math.random() * (400 + 200 + 1)) -
+    //             200,
+    //           y:
+    //             prevState.controls.window.height -
+    //             prevState.controls.window.height * 0.4 +
+    //             Math.floor(Math.random() * (150 + 100 + 1)) -
+    //             100
+    //         },
+    //         backgroundPosition: {
+    //           x: 0,
+    //           y: 0
+    //         },
+    //         dimensions: {
+    //           width: "100px",
+    //           height: "100px"
+    //         }
+    //       }
+    //     ]
+    //   };
+    // });
+
     setInterval(() => {
-      if (!this.state.bird.fireball.test.length > 0) {
+      this.setState(prevState => {
+        return {
+          ...prevState,
+          enemies: [
+            ...prevState.enemies,
+            {
+              position: {
+                x: prevState.controls.window.width - prevState.controls.window.width*0.3 + Math.floor(Math.random() * (400 + 200 + 1)) -200 ,
+                y: prevState.controls.window.height - Math.floor(Math.random() * (150 + 200 + 1)) -200
+              },
+                backgroundPosition: {
+                  x: 0,
+                  y: 0
+                },
+              dimensions: {
+                width: "100px",
+                height: "100px"
+              }
+            }
+          ]
+        };
+      });
+    }, 1500);
+
+    // Physics Loops
+
+    // Enemies
+    setInterval(() => {
+      const enemyData = this.state.enemies
+      .filter(enemyPosition => {
+        const distanceX = (Math.abs(enemyPosition.position.x - this.state.bird.position.x) < 60 )
+        const distanceY = (Math.abs(enemyPosition.position.y - this.state.bird.position.y) < 60)
+        const isIntersected = distanceX && distanceY
+        if (isIntersected) {
+          this.setState(prevState => {
+            return {
+              ...prevState,
+              score: prevState.score + 1
+            }
+          })
+        }
+        return !isIntersected
+      })
+      .map(enemy => {
+        return {
+          ...enemy,
+          position: {
+            x: enemy.position.x - 6,
+            y: enemy.position.y
+          },
+        };
+      });
+      this.setState((prevState) => {
+        return {
+          ...prevState,
+          enemies: enemyData
+        }
+      })
+    }, 16)
+
+    // Fireball
+    setInterval(() => {
+      if (!this.state.bird.fireball.animation.length) {
         return;
       }
-      const animateData = this.state.bird.fireball.test
+      const animateData = this.state.bird.fireball.animation
         .filter(fireballPosition => {
           return fireballPosition.x < 2000;
         })
@@ -188,6 +294,9 @@ class App extends Component {
             y: fireball.y
           };
         });
+
+      
+
       this.setState(prevState => {
         return {
           ...prevState,
@@ -196,12 +305,36 @@ class App extends Component {
             fireball: {
               ...prevState.bird.fireball,
               selected: true,
-              test: animateData
+              animation: animateData
             }
           }
         };
       });
     }, 16);
+
+    // Animation Loops
+    // Gold Coins
+    setInterval(() => {
+      if (this.state.enemies.length > 0) {
+        const animatedCoins = this.state.enemies.map(enemy => {
+          return {
+            ...enemy,
+            backgroundPosition: {
+              x: enemy.backgroundPosition.x,
+              y: enemy.backgroundPosition.y + 100
+            }
+          }
+        });
+        this.setState(prevState => {
+          return {
+            ...prevState,
+            enemies: animatedCoins
+          }
+        })
+      }
+    }, 64)
+
+    // Bird
     setInterval(() => {
       this.setState(prevState => {
         switch (prevState.bird.animation.x) {
@@ -248,7 +381,7 @@ class App extends Component {
   };
 
   render() {
-    const fireballContent = this.state.bird.fireball.test.map(fireball => {
+    const fireballContent = this.state.bird.fireball.animation.map(fireball => {
       return (
         <div
           key={Math.random()}
@@ -260,6 +393,23 @@ class App extends Component {
               this.state.bird.fireball.y
             }px`,
             transform: `translate(${fireball.x}%, ${fireball.y}%)`
+          }}
+        />
+      );
+    });
+
+    const enemyContent = this.state.enemies.map((enemy, i) => {
+      return (
+        <div
+          key={i}
+          className="enemy"
+          style={{
+            height: enemy.dimensions.height,
+            width: enemy.dimensions.width,
+            backgroundPosition: `${enemy.backgroundPosition.x}px ${
+              enemy.backgroundPosition.y
+            }px`,
+            transform: `translate(${enemy.position.x}%, ${enemy.position.y}%)`
           }}
         />
       );
@@ -296,23 +446,11 @@ class App extends Component {
             }%) scaleX(-1)`
           }}
         />
-        {/* <div
-          className="enemy"
-          style={{
-            height: this.state.bird.dimensions.height,
-            width: this.state.bird.dimensions.width,
-            backgroundPosition: `${this.state.bird.animation.x}px ${
-              this.state.bird.animation.y
-            }px`,
-            transform: `translate(${this.state.bird.position.x }%, ${
-              this.state.bird.position.y
-            }%)`
-          }}
-        /> */}
-        
+
         <button onClick={this.fireball} className="fire" />
 
         {fireballContent}
+        {enemyContent}
 
         <div className="score">
           <h1>
